@@ -1,0 +1,4 @@
+# pip-only list. The only system dependency is a JDK for Spark (e.g. conda install -c conda-forge openjdk=17).
+pymssql
+python-dotenv
+pyspark

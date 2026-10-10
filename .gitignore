@@ -1,0 +1,24 @@
+# Biến môi trường (Secrets)
+.env
+
+# Claude Code
+.claude/
+CLAUDE.md
+
+# Môi trường ảo Python
+venv/
+env/
+.venv/
+
+# Files rác của hệ điều hành
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Cache package của Spark (jar JDBC tải về)
+.ivy2/
+
+# Cache của Python
+__pycache__/
+*.py[cod]
+*$py.class
