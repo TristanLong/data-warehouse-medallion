@@ -11,4 +11,4 @@ if __name__ == "__main__":
     finally:
         db.close()
         print("Connection closed.")
-        clear_spark_cache()  # comment this line to keep the downloaded JDBC jar between runs
+        #clear_spark_cache()  # comment this line to keep the downloaded JDBC jar between runs

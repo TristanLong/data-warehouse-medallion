@@ -16,7 +16,7 @@ Thumbs.db
 desktop.ini
 
 # Cache package của Spark (jar JDBC tải về)
-.ivy2/
+.cache/
 
 # Cache của Python
 __pycache__/
