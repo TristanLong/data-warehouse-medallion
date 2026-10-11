@@ -1,37 +1,46 @@
 """Bronze layer: load raw source CSVs (CRM, ERP) as-is into bronze.* tables.
 
-<<<<<<< HEAD
-Full load (truncate and insert), no transformation. Sources: data/datasets/.
-"""
-
-from pyspark.sql import SparkSession
-
-
-def load_bronze(spark: SparkSession) -> None:
-    raise NotImplementedError
-=======
 Full load (truncate and insert), no cleaning. Run data/scripts/bronze/ddl_bronze.sql first so
 the tables exist. CSV columns are mapped by position, so header names don't matter.
 """
 
+from datetime import datetime
 from pathlib import Path
+from time import perf_counter
 
 from pyspark.sql import SparkSession
 
 from src.config.settings import jdbc_properties, jdbc_url
+from src.utils.etl_logging import LoadStatus, log_load_end, log_load_start
 
 DATASETS = Path(__file__).resolve().parents[3] / "data" / "datasets"
 
 
 def load_csv(spark: SparkSession, source: str, filename: str, table: str, schema: str) -> None:
     """Read data/datasets/<source>/<filename> with the given schema and full-load it into table."""
-    df = spark.read.csv(str(DATASETS / source / filename), header=True, schema=schema)
-    (
-        df.write.mode("overwrite")
-        .option("truncate", "true")
-        .jdbc(jdbc_url(), table, properties=jdbc_properties())
-    )
-    print(f"Loaded {filename} -> {table}")
+    start_time = datetime.now().astimezone()
+    start_counter = perf_counter()
+    status: LoadStatus = "FAILED"
+    log_load_start("bronze", source, filename, table, start_time)
+
+    try:
+        df = spark.read.csv(str(DATASETS / source / filename), header=True, schema=schema)
+        (
+            df.write.mode("overwrite")
+            .option("truncate", "true")
+            .jdbc(jdbc_url(), table, properties=jdbc_properties())
+        )
+        status = "SUCCESS"
+    except Exception as exc:
+        raise RuntimeError(
+            f"Failed to load {source}/{filename} into {table}"
+        ) from exc
+    finally:
+        end_time = datetime.now().astimezone()
+        duration = perf_counter() - start_counter
+        log_load_end(
+            "bronze", source, filename, table, start_time, end_time, status, duration
+        )
 
 
 def load_bronze(spark: SparkSession) -> None:
@@ -59,4 +68,3 @@ def load_bronze(spark: SparkSession) -> None:
         spark, "source_erp", "PX_CAT_G1V2.csv", "bronze.erp_px_cat_g1v2",
         "id STRING, cat STRING, subcat STRING, maintenance STRING",
     )
->>>>>>> 1df9fd776090d8133c5c693e9ccb6a69cd6a5136
