@@ -11,6 +11,6 @@ def run_pipeline() -> None:
     try:
         load_bronze(spark)
         load_silver(spark)
-        #load_gold(spark)
+        load_gold(spark)
     finally:
         stop_spark_session()
